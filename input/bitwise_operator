@@ -1,7 +1,0 @@
-func int x(int i):
-    println(i);
-    return i;
-end_func
-
-println(x(1) || x(0));
-println(x(1) && x(0));
