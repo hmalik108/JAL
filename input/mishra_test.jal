@@ -1,0 +1,11 @@
+int a;
+
+int b;
+b=5;
+a=7;
+int c;
+c = a+b;
+println(c);
+
+c = a * b ;
+println(c);

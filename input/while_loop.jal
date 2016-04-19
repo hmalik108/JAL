@@ -1,0 +1,9 @@
+int a;
+a = 3;
+int b;
+b = 5;
+
+while(a < b):
+	println(a);
+	a = a + 1;
+end_while
