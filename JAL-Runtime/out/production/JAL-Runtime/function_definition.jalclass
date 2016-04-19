@@ -1,0 +1,11 @@
+.start method randomNumber paramCount: 0
+
+push 4
+store i loc:0
+load i loc:0
+return
+.end method randomNumber
+
+ .invoke randomNumber paramsCount: 0
+println
+

@@ -1,0 +1,28 @@
+.start method greater paramCount: 2
+
+load a loc:0
+load b loc:1
+less_than
+
+if_true : branch:0
+load b loc:1
+store result loc:2
+goto endIf : branch:0
+if_not_true  : branch:0
+load a loc:0
+store result loc:2
+endIf : branch:0
+
+load result loc:2
+return
+.end method greater
+.start method main paramCount: 0
+push 10
+push 11
+.invoke greater paramsCount: 2
+println
+push 0
+return
+.end method main
+
+ 

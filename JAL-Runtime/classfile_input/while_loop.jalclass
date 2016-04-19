@@ -1,0 +1,22 @@
+
+ 
+push 3
+store a loc:0
+
+push 5
+store b loc:1
+while:
+load a loc:0
+load b loc:1
+less_than
+
+if_true : branch:0
+load a loc:0
+println
+load a loc:0
+push 1
+add
+store a loc:0
+end_while
+
+

@@ -1,0 +1,22 @@
+
+push 7
+push 8
+add
+println
+push 8
+push 4
+div
+push 2
+mul
+println
+push 8
+push 4
+div
+push 5
+push 2
+mul
+push 3
+add
+sub
+println
+

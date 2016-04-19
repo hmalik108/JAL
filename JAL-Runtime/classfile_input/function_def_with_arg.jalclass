@@ -1,0 +1,31 @@
+.start method add paramCount: 3
+
+push 42
+store d loc:3
+load a loc:0
+load b loc:1
+add
+load c loc:2
+add
+load d loc:3
+add
+return
+.end method add
+
+ 
+push 5
+store x loc:0
+
+push 8
+store y loc:1
+
+push 10
+store z loc:2
+load x loc:0
+push 4
+add
+load y loc:1
+load z loc:2
+.invoke add paramsCount: 3
+println
+

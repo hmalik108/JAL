@@ -1,0 +1,12 @@
+
+ push 0
+if_true : branch:0
+push 42
+println
+goto endIf : branch:0
+if_not_true  : branch:0
+push 81
+println
+endIf : branch:0
+
+

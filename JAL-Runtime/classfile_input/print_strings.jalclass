@@ -1,0 +1,11 @@
+
+push "Nikhil"
+print
+
+push 5
+store a loc:0
+push "JAL_Nikhil_Harish_Shujian"
+load a loc:0
+add
+println
+
