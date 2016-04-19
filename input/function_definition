@@ -1,7 +1,0 @@
-func int randomNumber():
-    int i;
-    i = 4;
-    return i;
-end_func
-
-println(randomNumber());
