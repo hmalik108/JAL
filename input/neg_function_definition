@@ -1,9 +1,0 @@
-println(randomNumber());
-
-func int add():
-    return 0;
-end_func
-
-func int add():
-    return 0;
-end_func
