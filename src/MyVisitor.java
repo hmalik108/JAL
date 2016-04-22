@@ -60,6 +60,16 @@ public class MyVisitor extends JALBaseVisitor<String> {
     }
 
     @Override
+    public String visitTrue(JALParser.TrueContext ctx) {
+        return "push true";
+    }
+
+    @Override
+    public String visitFalse(JALParser.FalseContext ctx) {
+        return "push false";
+    }
+
+    @Override
     public String visitString(JALParser.StringContext ctx) {
         return "push " + ctx.txt.getText();
     }
@@ -83,7 +93,7 @@ public class MyVisitor extends JALBaseVisitor<String> {
     }
 
     private int requireVariableToken(Token varNameToken){
-        Integer varIndex =  variables.get(varNameToken.getText());
+        Integer varIndex = variables.get(varNameToken.getText());
         if(varIndex == null)
             throw new UndeclaredVariableException(varNameToken);
         return varIndex;
@@ -109,9 +119,13 @@ public class MyVisitor extends JALBaseVisitor<String> {
         variables = new HashMap<>();
         visit(ctx.params);
         String statementsInstructions = visit(ctx.statements);
-        String result = ".start method " + ctx.funcName.getText() + " paramCount: " + ctx.params.declarations.size() + "\n" +
-                (statementsInstructions == null ? "" : statementsInstructions + "\n") + visit(ctx.returnValue) + "\n" + "return" + "\n"
+        String result1 = ".start method " + ctx.funcName.getText() + " paramCount: " + ctx.params.declarations.size() + "\n" ;
+        for(int i=0;i<ctx.params.declarations.size();i++){
+            result1 += "store " + ctx.params.declarations.get(i).varName.getText() + "\n";
+        }
+        String result2 = (statementsInstructions == null ? "" : statementsInstructions + "\n") + visit(ctx.returnValue) + "\n" + "return" + "\n"
                 + ".end method " + ctx.funcName.getText();
+        String result = result1 + result2;
         variables = oldVariables;
         return result;
     }
@@ -142,9 +156,9 @@ public class MyVisitor extends JALBaseVisitor<String> {
         int branchNum = branchCounter;
         ++branchCounter;
 
-        return conditionInstruction + "\n" + "if_true : branch:" + branchNum + "\n" + onTrueInstruction + "\n" +
-                "goto endIf : branch:" + branchNum + "\n" + "if_not_true  : branch:" + branchNum + "\n" + onFalseInstruction +"\n" +
-                "endIf : branch:" + branchNum + "\n";
+        return conditionInstruction + "\n" + "branch:"+branchNum+" if_true:"+"\n" + onTrueInstruction + "\n" +
+                "branch:"+branchNum+" goto endIf" + "\n" + "branch:"+branchNum+" if_not_true: "+"\n" + onFalseInstruction +"\n" +
+                "branch:"+branchNum+" endIf:" + "\n";
     }
 
     @Override
@@ -154,8 +168,36 @@ public class MyVisitor extends JALBaseVisitor<String> {
         int branchNum = whileCounter;
         ++whileCounter;
 
-        return "while:" + "\n" + conditionInstruction + "\n" + "if_true : branch:" + branchNum + "\n" + onTrueInstruction
+        return "while:" + "\n" + conditionInstruction + "\n" + "branch:" +branchNum+ " if_true:" + branchNum + "\n" + onTrueInstruction
                 + "\n" + "end_while" + "\n";
+    }
+
+    @Override
+    public String visitStack(JALParser.StackContext ctx) {
+        return "stack " +ctx.varName.getText() + "\n";
+    }
+
+    @Override
+    public String visitStackOperations(JALParser.StackOperationsContext ctx) {
+        String opr = ctx.getChild(2).getText().replaceAll("\\)", "").replaceAll("\\(","");
+        String result = "";
+        switch(opr){
+            case "push":
+                result = "push_stack " + ctx.varName.getText() + " " + ctx.num.getText();
+                break;
+            case "pop":
+                result = "pop_stack " + ctx.varName.getText();
+                break;
+            case "top":
+                result = "top_stack " + ctx.varName.getText();
+                break;
+            case "isEmpty":
+                result = "isEmpty_stack " + ctx.varName.getText();
+                break;
+            default:
+                throw new IllegalArgumentException("Operation is Not defined");
+        }
+        return result;
     }
 
     @Override
