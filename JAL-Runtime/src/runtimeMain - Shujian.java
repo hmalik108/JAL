@@ -1,25 +1,43 @@
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 import java.io.*;
 
 
 public class runtimeMain {
 	Stack<Integer> variable = new Stack<>();
-	HashMap<String,Stack<Integer>> SymbolTable = new HashMap<>();
-	HashMap<String,Integer> FunctionStartLine = new HashMap<>();
+	HashMap<String, Stack<Integer>> SymbolTable = new HashMap<>();
+	HashMap<String, Integer> FunctionStartLine = new HashMap<>();
     String[][] allCommands = null;
 
 	public void excuteFuncion(String[] command) {
 		String functionName = command[2];
 		int scanIndex = FunctionStartLine.get(functionName) + 1;
+		HashMap<String, Integer> LocalVariableCount = new HashMap<>();
 		while (true) {
 			if (allCommands[scanIndex][0] == ".end" &&
 	        	allCommands[scanIndex][2] == functionName) {
 	        	break;
 	        }
+			if (allCommands[scanIndex][0] == "store") {
+				if (LocalVariableCount.get(allCommands[scanIndex][1]) == null) {
+					LocalVariableCount.put(allCommands[scanIndex][1], 1);
+				} else {
+					int add1 = LocalVariableCount.get(allCommands[scanIndex][1]);
+					LocalVariableCount.put(allCommands[scanIndex][1], add1);
+				}
+			}
 			excuteCommand(allCommands[scanIndex]);
 			scanIndex++;
 		}
+		for(Map.Entry<String, Integer> entry : LocalVariableCount.entrySet()){
+			String LocalVariable = entry.getKey();
+			int VariableCount = entry.getValue();
+			while (VariableCount > 0) {
+				SymbolTable.get(LocalVariable).pop();
+			}
+		}
+
 	}
 	
 	
@@ -90,7 +108,7 @@ public class runtimeMain {
         default:
             System.out.println();
             throw new IllegalArgumentException("Command not recognized" + command[0]);
-    }
+		}
 	}
 
 	public void readFile(String fileName)throws IOException {
@@ -124,7 +142,30 @@ public class runtimeMain {
 	
 	
 	public static void main(String[] args) throws IOException {
-
-        
+		test();
     }
+	
+	public static void test() {
+		HashMap<String,Stack<Integer>> SymbolTable = new HashMap<>();
+
+    	Stack<Integer> variableStack = new Stack<>();
+    	variableStack.push(1);
+    	if (SymbolTable.get("test1") == null) {
+    		System.out.println(SymbolTable.get("test1"));
+    	}
+    	SymbolTable.put("test1", variableStack);
+    	variableStack.push(2);
+//    	SymbolTable.get("test1");
+    	System.out.println(SymbolTable.get("test1"));
+    	variableStack.push(3);
+    	System.out.println(SymbolTable.get("test1"));
+    	SymbolTable.get("test1").push(4);
+    	System.out.println(SymbolTable.get("test1"));
+    	
+    	HashMap<String,Integer> test = new HashMap<>();
+    	test.put("s1", 123);
+    	int add1 = test.get("s1") + 1;
+    	test.put("s1", add1);
+    	System.out.println(test.get("s1"));
+	}
 }
