@@ -1,0 +1,48 @@
+.start method bavaisgreat paramCount: 0
+
+push 4
+store a loc:0
+
+push 5
+store b loc:1
+load a loc:0
+load b loc:1
+less_than
+
+branch_if:1 if_true:
+load b loc:1
+push 4
+less_than
+
+branch_if:0 if_true:
+load a loc:0
+load b loc:1
+add
+println
+branch_if:0 goto endIf
+branch_if:0 if_not_true: 
+load a loc:0
+println
+branch_if:0 endIf:
+
+branch_if:1 goto endIf
+branch_if:1 if_not_true: 
+load a loc:0
+load a loc:0
+mul
+load b loc:1
+add
+println
+branch_if:1 endIf:
+
+load a loc:0
+return
+.end method bavaisgreat
+.start method main paramCount: 0
+.invoke bavaisgreat paramsCount: 0
+println
+push 0
+return
+.end method main
+
+ 
