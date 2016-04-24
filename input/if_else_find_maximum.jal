@@ -1,0 +1,15 @@
+func int max(int a, int b):
+	int c;
+	if(a<b):
+		c = b;
+	else:
+		c = a;
+	end_if
+	return c;
+end_func
+
+
+func int main():
+	println(max(5,8));
+	return 0;
+end_func

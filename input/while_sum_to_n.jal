@@ -1,0 +1,17 @@
+func int sum(int a):
+	int c;
+	c = 1;
+	int sum;
+	sum = 0;
+	while(c<a):
+		sum = sum + c;
+		c = c + 1;
+	end_while
+	return sum;
+end_func
+
+
+func int main():
+	println(sum(10));
+	return 0;
+end_func
