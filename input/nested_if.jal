@@ -1,0 +1,26 @@
+func int bavaisgreat():
+	int a;
+	a = 4;
+	int b;
+	b = 5;
+	if( a < b):
+		if(b < 4):
+			println(a+b);
+		else:
+			println(a);
+		end_if
+	else:
+		println(a * a+b);
+	end_if
+	
+	return a;
+	
+end_func
+
+
+
+
+func int main():
+	println(bavaisgreat());
+	return 0;
+end_func

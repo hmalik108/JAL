@@ -1,0 +1,5 @@
+func int main():
+	bool b;
+	b = true;
+	return 0;
+end_func
