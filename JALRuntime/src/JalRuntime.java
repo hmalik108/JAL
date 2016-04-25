@@ -11,13 +11,18 @@ public class JalRuntime {
     HashMap<String, Stack<Integer>> SymbolTable = new HashMap<>();
     HashMap<String, Integer> functionStartLine = new HashMap<String, Integer>();
 
+    private static int scanIndex = 0;
+    private static boolean less_than_flag = false;
+    private static boolean if_flag = false;
+    private static int methodScanIndex = 0;
+
     /**
      *
      * @param args
      */
     public static void main(String[] args) throws IOException {
 
-        String s = "test.jalclass";
+        String s = "if_else_find_maximum.jalclass";//"test.jalclass";
         //new JalRuntime().evaluateBytecode(args[0]);
         new JalRuntime().evaluateBytecode(s);
 
@@ -28,7 +33,7 @@ public class JalRuntime {
 
     private void evaluateBytecode(String filename) throws IOException {
 
-        //System.out.println("In evaluateBytecode");
+        ////System.out.println("In evaluateBytecode");
         parseFile(filename);
 
 
@@ -37,7 +42,7 @@ public class JalRuntime {
 
     private void parseFile(String filename) throws IOException {
 
-        //System.out.println("In parseFile");
+        ////System.out.println("In parseFile");
         FileInputStream fis = new FileInputStream(filename);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
         String line = null;
@@ -48,7 +53,8 @@ public class JalRuntime {
         while ((line = br.readLine()) != null) {
             allStatements.add(new ArrayList<String>(Arrays.asList(line.split(" "))));
             //allCommands[length] = line.split(" ");
-            if(allStatements.get(lineNum).get(0).equals(".start")){
+            ////System.out.println("allStatements"+allStatements);
+            if(!allStatements.get(lineNum).isEmpty()  && allStatements.get(lineNum).get(0).equals(".start")){
                 if(allStatements.get(lineNum).get(2).equals("main")){
                     startLine = lineNum;
                 } else {
@@ -66,8 +72,8 @@ public class JalRuntime {
             */
             lineNum++;
         }
-        //System.out.println("parseFile allStatements:"+allStatements.get(0).get(2));
-        int scanIndex = startLine;
+        ////System.out.println("parseFile allStatements:"+allStatements.get(0).get(2));
+        scanIndex = startLine;
         while (true) {
             if(allStatements.get(scanIndex).get(0).trim().equals(".end")  &&
                     allStatements.get(scanIndex).get(2).trim().equals("main")){
@@ -76,6 +82,7 @@ public class JalRuntime {
 
             //excuteCommand(allCommands[scanIndex]);
             //System.out.println("allStatements.get(scanIndex):"+allStatements.get(scanIndex));
+            // //System.out.println("variable stack:"+variableStack);
             excuteCommand(allStatements.get(scanIndex));
             scanIndex++;
         }
@@ -85,67 +92,97 @@ public class JalRuntime {
 
     public void excuteCommand(List<String> command) {
 
-            //System.out.println("In executeCommand: "+command);
+        ////System.out.println("In executeCommand: "+command);
 
-            int a,b,result;
-            switch(command.get(0)){
-                case "push":
-                    //variable.push(Integer.parseInt(command.get(1)));
-                    variableStack.push(Integer.parseInt(command.get(1)));
-                    break;
-                case "add":
-                    b = variableStack.pop();
-                    a = variableStack.pop();
-                    result = b + a ;
+        int a,b,result;
+        ;//System.out.println("Switch command:"+command);
+        switch(command.get(0)){
+
+
+
+
+            case "branch_if:0":
+                //System.out.println("In branch_if:0");
+                evaluate_if(command);
+
+                break;
+
+
+            case "less_than":
+                //System.out.println("In less_than");
+                b = variableStack.pop();
+                a = variableStack.pop();
+                if( a < b){
+                    less_than_flag = true;
+                    if_flag = true;
+                }
+                else {
+                    less_than_flag = false;
+                    if_flag = false;
+                }
+                break;
+
+            case "push":
+                //variable.push(Integer.parseInt(command.get(1)));
+                variableStack.push(Integer.parseInt(command.get(1)));
+                break;
+            case "add":
+                b = variableStack.pop();
+                a = variableStack.pop();
+                result = b + a ;
+                variableStack.push(result);
+                break;
+            case "sub":
+                b = variableStack.pop();
+                a = variableStack.pop();
+                result = a - b ;
+                variableStack.push(result);
+                break;
+            case "mul":
+                b = variableStack.pop();
+                a = variableStack.pop();
+                result = b * a ;
+                variableStack.push(result);
+                break;
+            case "div":
+
+
+                b = variableStack.pop();
+                a = variableStack.pop();
+
+                if ( b == 0){
+                    throw new ArithmeticException("Divide by zero not supported by JAL" );
+                }
+                else{
+                    result = a / b ;
                     variableStack.push(result);
-                    break;
-                case "sub":
-                    b = variableStack.pop();
-                    a = variableStack.pop();
-                    result = a - b ;
-                    variableStack.push(result);
-                    break;
-                case "mul":
-                    b = variableStack.pop();
-                    a = variableStack.pop();
-                    result = b * a ;
-                    variableStack.push(result);
-                    break;
-                case "div":
+                }
+                break;
+            case "print":
+                System.out.print(variableStack.peek());
+                break;
+            case "println":
+                System.out.println(variableStack.peek());
+                break;
+            case "":
+                break;
+            case "store":
+                // System.out.println("variable stack:"+variableStack);
 
+                Stack<Integer> symbolTableStack = null;
+                if( SymbolTable.get(command.get(1)) == null ){
+                    symbolTableStack = new Stack<Integer>();
+                    symbolTableStack.push(variableStack.pop());
 
-                    b = variableStack.pop();
-                    a = variableStack.pop();
+                }
+                else{
+                    symbolTableStack = SymbolTable.get(command.get(1));
+                    symbolTableStack.push(variableStack.pop());
+                }
 
-                    if ( b == 0){
-                        throw new ArithmeticException("Divide by zero not supported by JAL" );
-                    }
-                    else{
-                        result = a / b ;
-                        variableStack.push(result);
-                    }
-                    break;
-                case "print":
-                    System.out.print(variableStack.peek());
-                    break;
-                case "println":
-                    System.out.println(variableStack.peek());
-                    break;
-                case "":
-                    break;
-                case "store":
-                    Stack<Integer> symbolTableStack = null;
-                    if( SymbolTable.get(command.get(1)) == null ){
-                         symbolTableStack = new Stack<Integer>();
-                        symbolTableStack.push(variableStack.pop());
-
-                    }
-                    else{
-                        symbolTableStack = SymbolTable.get(command.get(1));
-                    }
-
-                    SymbolTable.put(command.get(1), symbolTableStack);
-
+                SymbolTable.put(command.get(1), symbolTableStack);
+                // System.out.println("SymbolTable :"+SymbolTable);
+                // System.out.println("did u reach here");
 
                     /*
                     if (SymbolTable.get(command.get(1)) == null) {
@@ -156,46 +193,98 @@ public class JalRuntime {
                         SymbolTable.get(command.get(1)).push(variableStack.pop());
                     }
                     */
-                    break;
-                case "load":
-                    variableStack.push(SymbolTable.get(command.get(1)).peek());
-                    break;
-                case ".start":
-                    //functionNames.put(command[2],new Pair())
-                    break;
-                case ".end":
-                    //Function ends move back to global table
-                    //Function move back to local stack
-                    break;
-                case "return":
-                    //Return top of the local stack
-                    break;
-                case ".invoke":
-                   excuteFunction(command);
-                    break;
+                break;
+            case "load":
+                //System.out.println("commsnd:"+command);
+                //System.out.println("load:SymbolTable.get(command.get(1)).peek():"+SymbolTable.get(command.get(1)).peek());
+                //System.out.println("load: variableStack"+variableStack);
+                variableStack.push(SymbolTable.get(command.get(1)).peek());
 
-                default:
-                    //System.out.println();
-                    throw new IllegalArgumentException("Command not recognized" + command.get(0));
+                break;
+            case ".start":
+                //functionNames.put(command[2],new Pair())
+                break;
+            case ".end":
+                //Function ends move back to global table
+                //Function move back to local stack
+                break;
+            case "return":
+                //Return top of the local stack
+                break;
+            case ".invoke":
+                excuteFunction(command);
+                break;
+
+            default:
+                //System.out.println();
+                throw new IllegalArgumentException("Command not recognized" + command.get(0));
+        }
+    }
+
+    private void evaluate_if(List<String> command) {
+
+
+        //System.out.println("functionStartLine:"+command);
+        // String functionName = command.get(1).trim();
+
+        //System.out.println("evaluate_if if_flag"+allStatements.get(methodScanIndex));
+        if(if_flag){
+            methodScanIndex++;
+            while(!allStatements.get(methodScanIndex).contains("goto") && !allStatements.get(methodScanIndex).contains("endIf")){
+                excuteCommand(allStatements.get(methodScanIndex));
+                methodScanIndex++;
             }
+            methodScanIndex++;
+            if(allStatements.get(methodScanIndex).contains("if_not_true:")){
+                while(!allStatements.get(methodScanIndex).contains("endIf:")){
+                    methodScanIndex++;
+                }
+            }
+
+        }
+        else{
+
+            //System.out.println("else1"+allStatements.get(methodScanIndex));
+            methodScanIndex++;
+            while(!allStatements.get(methodScanIndex).contains("goto") && !allStatements.get(methodScanIndex).contains("endIf")){
+                //System.out.println("else2"+allStatements.get(methodScanIndex));
+                methodScanIndex++;
+            }
+            methodScanIndex++;
+            if(allStatements.get(methodScanIndex).contains("if_not_true:")){
+                methodScanIndex++;
+                while(!allStatements.get(methodScanIndex).contains("endIf:")){
+                    //System.out.println("else3"+allStatements.get(methodScanIndex));
+                    excuteCommand(allStatements.get(methodScanIndex));
+                    methodScanIndex++;
+                }
+            }
+
+
+        }
+
+        // //System.out.println("variable stack"+variableStack);
+        //excuteCommand(allStatements.get(scanIndex));
+
     }
 
     private void excuteFunction(List<String> command) {
 
 
-            //System.out.println("In excuteFunction:"+command);
+        //System.out.println("In excuteFunction:"+command);
 
-            String functionName = command.get(1).trim();
+        String functionName = command.get(1).trim();
         //System.out.println("functionStartLine:"+functionName);
-            int scanIndex = functionStartLine.get(functionName) + 1;
-            //HashMap<String, Integer> LocalVariableCount = new HashMap<>();
-            HashMap<String, Integer> localVariableMap = new HashMap<String,Integer>();
-            while (true) {
+        // int scanIndex = functionStartLine.get(functionName) + 1;
+        methodScanIndex = functionStartLine.get(functionName) + 1;
+        //HashMap<String, Integer> LocalVariableCount = new HashMap<>();
+        HashMap<String, Integer> localVariableMap = new HashMap<String,Integer>();
+        while (true) {
 
-                if(allStatements.get(scanIndex).get(0).trim().equals(".end")&&
-                        allStatements.get(scanIndex).get(2).trim().equals(functionName)){
-                    break;
-                }
+            if(!allStatements.get(methodScanIndex).isEmpty() && allStatements.get(methodScanIndex).get(0).trim().equals(".end")&&
+                    allStatements.get(methodScanIndex).get(2).trim().equals(functionName)){
+                break;
+            }
 
                 /*
                 if(allStatements.get(scanIndex).get(0).equals("store")){
@@ -214,11 +303,11 @@ public class JalRuntime {
                     }
                 }
                 */
-                excuteCommand(allStatements.get(scanIndex));
-                scanIndex++;
+            excuteCommand(allStatements.get(methodScanIndex));
+            methodScanIndex++;
 
 
-            }
+        }
         /*
             for(Map.Entry<String, Integer> entry : LocalVariableCount.entrySet()){
                 String LocalVariable = entry.getKey();
