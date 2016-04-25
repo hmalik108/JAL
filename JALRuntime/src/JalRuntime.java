@@ -108,6 +108,20 @@ public class JalRuntime {
                 break;
 
 
+            case "greater_than":
+
+                System.out.println(variableStack);
+                b = variableStack.pop();
+                a = variableStack.pop();
+
+                if( a > b ){
+                    if_flag = true;
+                }
+                else{
+                    if_flag = false;
+                }
+                break;
+
             case "less_than":
                 //System.out.println("In less_than");
                 b = variableStack.pop();
