@@ -133,6 +133,20 @@ public class JalRuntime {
                 }
                 break;
 
+            case "greater_than_or_equal":
+
+                //System.out.println(variableStack);
+                b = variableStack.pop();
+                a = variableStack.pop();
+
+                if( a >= b ){
+                    if_flag = true;
+                }
+                else{
+                    if_flag = false;
+                }
+                break;
+
             case "less_than":
                 //System.out.println("In less_than");
                 b = variableStack.pop();
@@ -146,6 +160,21 @@ public class JalRuntime {
                     if_flag = false;
                 }
                 break;
+
+            case "less_than_or_equal":
+                //System.out.println("In less_than");
+                b = variableStack.pop();
+                a = variableStack.pop();
+                if( a <= b){
+                    less_than_flag = true;
+                    if_flag = true;
+                }
+                else {
+                    less_than_flag = false;
+                    if_flag = false;
+                }
+                break;
+
 
             case "push":
                 //variable.push(Integer.parseInt(command.get(1)));
