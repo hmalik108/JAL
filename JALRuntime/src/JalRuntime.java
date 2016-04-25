@@ -22,7 +22,7 @@ public class JalRuntime {
      */
     public static void main(String[] args) throws IOException {
 
-        String s = "if_else_find_maximum.jalclass";//"test.jalclass";
+        String s = "while_sum_to_n.jalclass";//"test.jalclass";
         //new JalRuntime().evaluateBytecode(args[0]);
         new JalRuntime().evaluateBytecode(s);
 
@@ -107,10 +107,21 @@ public class JalRuntime {
 
                 break;
 
+            case "branch_loop:0":
+
+                break;
+
+
+            case "while:":
+
+                evaluate_while(command);
+
+                break;
+
 
             case "greater_than":
 
-                System.out.println(variableStack);
+                //System.out.println(variableStack);
                 b = variableStack.pop();
                 a = variableStack.pop();
 
@@ -233,6 +244,46 @@ public class JalRuntime {
                 //System.out.println();
                 throw new IllegalArgumentException("Command not recognized" + command.get(0));
         }
+    }
+
+    private void evaluate_while(List<String> command) {
+
+        int while_start_index = methodScanIndex;
+        int while_end_index = 0;
+        methodScanIndex++;
+        while(!allStatements.get(methodScanIndex).contains("branch_loop:0"))
+        {
+            //System.out.println("In while 1st while, stats"+allStatements.get(methodScanIndex));
+            excuteCommand(allStatements.get(methodScanIndex++));
+        }
+
+
+        if(if_flag){
+            //System.out.println("In while if");
+            methodScanIndex++;
+            while(!allStatements.get(methodScanIndex).contains("end_while")){
+                //System.out.println("In while if2"+allStatements.get(methodScanIndex));
+                excuteCommand(allStatements.get(methodScanIndex));
+                methodScanIndex++;
+            }
+            methodScanIndex = while_start_index;
+            excuteCommand(allStatements.get(methodScanIndex));
+            //while_end_index = methodScanIndex + 1;
+        }
+
+        else{
+            //System.out.println("in while else");
+
+
+            while(!allStatements.get(methodScanIndex).contains("end_while")){
+                //System.out.println("stats:"+allStatements.get(methodScanIndex));
+                methodScanIndex++;
+                //excuteCommand(allStatements.get(methodScanIndex));
+            }
+            methodScanIndex++;
+        }
+
+
     }
 
     private void evaluate_if(List<String> command) {
