@@ -8,7 +8,7 @@ public class JalRuntime {
 
     List<List<String>> allStatements = null;
     Stack<Integer> variableStack = new Stack<Integer>();
-    HashMap<String, Stack<Integer>> SymbolTable = new HashMap<>();
+    HashMap<String, Stack<Integer>> GlobalSymbolTable = new HashMap<>();
     HashMap<String, Integer> functionStartLine = new HashMap<String, Integer>();
 
     private static int scanIndex = 0;
@@ -74,23 +74,13 @@ public class JalRuntime {
         }
         ////System.out.println("parseFile allStatements:"+allStatements.get(0).get(2));
         scanIndex = startLine;
-        while (true) {
-            if(allStatements.get(scanIndex).get(0).trim().equals(".end")  &&
-                    allStatements.get(scanIndex).get(2).trim().equals("main")){
-                break;
-            }
-
-            //excuteCommand(allCommands[scanIndex]);
-            //System.out.println("allStatements.get(scanIndex):"+allStatements.get(scanIndex));
-            // //System.out.println("variable stack:"+variableStack);
-            excuteCommand(allStatements.get(scanIndex));
-            scanIndex++;
-        }
+        
+        excuteFunction(allStatements.get(scanIndex));
         br.close();
     }
 
 
-    public void excuteCommand(List<String> command) {
+    public void excuteCommand(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
 
         ////System.out.println("In executeCommand: "+command);
 
@@ -103,7 +93,7 @@ public class JalRuntime {
 
             case "branch_if:0":
                 //System.out.println("In branch_if:0");
-                evaluate_if(command);
+                evaluate_if(command, SymbolTable);
 
                 break;
 
@@ -114,7 +104,7 @@ public class JalRuntime {
 
             case "while:":
 
-                evaluate_while(command);
+                evaluate_while(command, SymbolTable);
 
                 break;
 
@@ -253,6 +243,16 @@ public class JalRuntime {
                 //System.out.println("load:SymbolTable.get(command.get(1)).peek():"+SymbolTable.get(command.get(1)).peek());
                 //System.out.println("load: variableStack"+variableStack);
                 variableStack.push(SymbolTable.get(command.get(1)).peek());
+                
+                if (SymbolTable.get(command.get(1)) != null) {
+                    variableStack.push(SymbolTable.get(command.get(1)).peek());
+                } else {
+                	if (GlobalSymbolTable.get(command.get(1)) != null) {
+                		variableStack.push(GlobalSymbolTable.get(command.get(1)).peek());
+                	} else {
+                		// error
+                	}
+                }
 
                 break;
             case ".start":
@@ -275,7 +275,7 @@ public class JalRuntime {
         }
     }
 
-    private void evaluate_while(List<String> command) {
+    private void evaluate_while(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
 
         int while_start_index = methodScanIndex;
         int while_end_index = 0;
@@ -283,7 +283,7 @@ public class JalRuntime {
         while(!allStatements.get(methodScanIndex).contains("branch_loop:0"))
         {
             //System.out.println("In while 1st while, stats"+allStatements.get(methodScanIndex));
-            excuteCommand(allStatements.get(methodScanIndex++));
+            excuteCommand(allStatements.get(methodScanIndex++), SymbolTable);
         }
 
 
@@ -292,11 +292,11 @@ public class JalRuntime {
             methodScanIndex++;
             while(!allStatements.get(methodScanIndex).contains("end_while")){
                 //System.out.println("In while if2"+allStatements.get(methodScanIndex));
-                excuteCommand(allStatements.get(methodScanIndex));
+                excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
                 methodScanIndex++;
             }
             methodScanIndex = while_start_index;
-            excuteCommand(allStatements.get(methodScanIndex));
+            excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
             //while_end_index = methodScanIndex + 1;
         }
 
@@ -315,7 +315,7 @@ public class JalRuntime {
 
     }
 
-    private void evaluate_if(List<String> command) {
+    private void evaluate_if(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
 
 
         //System.out.println("functionStartLine:"+command);
@@ -325,7 +325,7 @@ public class JalRuntime {
         if(if_flag){
             methodScanIndex++;
             while(!allStatements.get(methodScanIndex).contains("goto") && !allStatements.get(methodScanIndex).contains("endIf")){
-                excuteCommand(allStatements.get(methodScanIndex));
+                excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
                 methodScanIndex++;
             }
             methodScanIndex++;
@@ -349,7 +349,7 @@ public class JalRuntime {
                 methodScanIndex++;
                 while(!allStatements.get(methodScanIndex).contains("endIf:")){
                     //System.out.println("else3"+allStatements.get(methodScanIndex));
-                    excuteCommand(allStatements.get(methodScanIndex));
+                    excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
                     methodScanIndex++;
                 }
             }
@@ -372,7 +372,7 @@ public class JalRuntime {
         // int scanIndex = functionStartLine.get(functionName) + 1;
         methodScanIndex = functionStartLine.get(functionName) + 1;
         //HashMap<String, Integer> LocalVariableCount = new HashMap<>();
-        HashMap<String, Integer> localVariableMap = new HashMap<String,Integer>();
+        HashMap<String, Stack<Integer>> localSymbolTable = new HashMap<String, Stack<Integer>>();
         while (true) {
 
             if(!allStatements.get(methodScanIndex).isEmpty() && allStatements.get(methodScanIndex).get(0).trim().equals(".end")&&
@@ -397,7 +397,7 @@ public class JalRuntime {
                     }
                 }
                 */
-            excuteCommand(allStatements.get(methodScanIndex));
+            excuteCommand(allStatements.get(methodScanIndex), localSymbolTable);
             methodScanIndex++;
 
 
