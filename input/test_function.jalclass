@@ -1,0 +1,23 @@
+.start method test paramCount: 0
+
+push 6
+store a loc:0
+load a loc:0
+println
+push 0
+return
+.end method test
+.start method main paramCount: 0
+
+push 5
+store a loc:0
+
+.invoke test paramsCount: 0
+store b loc:1
+load a loc:0
+println
+push 0
+return
+.end method main
+
+ 

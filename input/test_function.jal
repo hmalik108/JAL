@@ -1,0 +1,15 @@
+func int test():
+    int a;
+	a = 6;
+	println(a);
+	return 0;
+end_func
+
+func int main():
+	int a;
+	a = 5;
+	int b;
+	b = test();
+	println(a);
+	return 0;
+end_func

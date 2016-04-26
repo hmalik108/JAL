@@ -22,7 +22,7 @@ public class JalRuntime {
      */
     public static void main(String[] args) throws IOException {
 
-        String s = "while_sum_to_n.jalclass";//"test.jalclass";
+        String s = "E:/JAL/input/test_function.jalclass";//"test.jalclass";
         //new JalRuntime().evaluateBytecode(args[0]);
         new JalRuntime().evaluateBytecode(s);
 
@@ -57,9 +57,8 @@ public class JalRuntime {
             if(!allStatements.get(lineNum).isEmpty()  && allStatements.get(lineNum).get(0).equals(".start")){
                 if(allStatements.get(lineNum).get(2).equals("main")){
                     startLine = lineNum;
-                } else {
-                    functionStartLine.put(allStatements.get(lineNum).get(2), lineNum);
-                }
+                } 
+                functionStartLine.put(allStatements.get(lineNum).get(2), lineNum);
             }
             /*
             if (allCommands[length][0] == ".start") {
@@ -74,8 +73,8 @@ public class JalRuntime {
         }
         ////System.out.println("parseFile allStatements:"+allStatements.get(0).get(2));
         scanIndex = startLine;
-        
-        excuteFunction(allStatements.get(scanIndex));
+//        System.out.println(allStatements.get(scanIndex));
+        excuteFunction(scanIndex);
         br.close();
     }
 
@@ -266,7 +265,11 @@ public class JalRuntime {
                 //Return top of the local stack
                 break;
             case ".invoke":
-                excuteFunction(command);
+            	String functionName = command.get(1);
+//            	System.out.println(functionName);
+                //System.out.println("functionStartLine:"+functionName);
+                // int scanIndex = functionStartLine.get(functionName) + 1;
+                excuteFunction(functionStartLine.get(functionName) + 1);
                 break;
 
             default:
@@ -362,21 +365,19 @@ public class JalRuntime {
 
     }
 
-    private void excuteFunction(List<String> command) {
+    private void excuteFunction(int index) {
 
 
         //System.out.println("In excuteFunction:"+command);
 
-        String functionName = command.get(1).trim();
-        //System.out.println("functionStartLine:"+functionName);
-        // int scanIndex = functionStartLine.get(functionName) + 1;
-        methodScanIndex = functionStartLine.get(functionName) + 1;
+//        String functionName = command.get(2).trim();
+        int methodScanIndex = index;
         //HashMap<String, Integer> LocalVariableCount = new HashMap<>();
         HashMap<String, Stack<Integer>> localSymbolTable = new HashMap<String, Stack<Integer>>();
         while (true) {
 
-            if(!allStatements.get(methodScanIndex).isEmpty() && allStatements.get(methodScanIndex).get(0).trim().equals(".end")&&
-                    allStatements.get(methodScanIndex).get(2).trim().equals(functionName)){
+            if(!allStatements.get(methodScanIndex).isEmpty() && 
+            		allStatements.get(methodScanIndex).get(0).trim().equals(".end")){
                 break;
             }
 
