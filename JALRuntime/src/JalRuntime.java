@@ -11,10 +11,10 @@ public class JalRuntime {
     HashMap<String, Stack<Integer>> GlobalSymbolTable = new HashMap<>();
     HashMap<String, Integer> functionStartLine = new HashMap<String, Integer>();
 
-    private static int scanIndex = 0;
+    private static int index = 0;
     private static boolean less_than_flag = false;
     private static boolean if_flag = false;
-    private static int methodScanIndex = 0;
+//    private static int methodScanIndex = 0;
 
     /**
      *
@@ -22,14 +22,13 @@ public class JalRuntime {
      */
     public static void main(String[] args) throws IOException {
 
-        String s = "E:/JAL/input/test_function.jalclass";//"test.jalclass";
+        String s = "E:/JAL/input/nested_if.jalclass";//"test.jalclass";
         //new JalRuntime().evaluateBytecode(args[0]);
         new JalRuntime().evaluateBytecode(s);
 
 
 
     }
-
 
     private void evaluateBytecode(String filename) throws IOException {
 
@@ -38,7 +37,6 @@ public class JalRuntime {
 
 
     }
-
 
     private void parseFile(String filename) throws IOException {
 
@@ -72,39 +70,37 @@ public class JalRuntime {
             lineNum++;
         }
         ////System.out.println("parseFile allStatements:"+allStatements.get(0).get(2));
-        scanIndex = startLine;
 //        System.out.println(allStatements.get(scanIndex));
-        excuteFunction(scanIndex);
+        index = startLine + 1;
+        excuteFunction();
         br.close();
     }
 
-
     public void excuteCommand(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
-
-        ////System.out.println("In executeCommand: "+command);
-
+    	
+//    	int currentIndex = index; // just for test
+//    	System.out.println("Index: " + currentIndex + " In executeCommand: " + command);
+//    	System.out.println(variableStack);
+//    	System.out.println("Index: " + index);
         int a,b,result;
         ;//System.out.println("Switch command:"+command);
         switch(command.get(0)){
 
-
-
-
             case "branch_if:0":
                 //System.out.println("In branch_if:0");
-                evaluate_if(command, SymbolTable);
-
+                evaluate_if(SymbolTable);
+                index++;
                 break;
 
             case "branch_loop:0":
-
+            	index++;
                 break;
 
 
             case "while:":
-
-                evaluate_while(command, SymbolTable);
-
+            	
+                evaluate_while(SymbolTable);
+                
                 break;
 
 
@@ -120,6 +116,7 @@ public class JalRuntime {
                 else{
                     if_flag = false;
                 }
+                index++;
                 break;
 
             case "greater_than_or_equal":
@@ -134,6 +131,8 @@ public class JalRuntime {
                 else{
                     if_flag = false;
                 }
+                index++;
+
                 break;
 
             case "less_than":
@@ -148,6 +147,8 @@ public class JalRuntime {
                     less_than_flag = false;
                     if_flag = false;
                 }
+                index++;
+
                 break;
 
             case "less_than_or_equal":
@@ -162,34 +163,43 @@ public class JalRuntime {
                     less_than_flag = false;
                     if_flag = false;
                 }
+                index++;
+
                 break;
 
 
             case "push":
                 //variable.push(Integer.parseInt(command.get(1)));
                 variableStack.push(Integer.parseInt(command.get(1)));
+//                System.out.println(variableStack);
+                index++;
+
                 break;
             case "add":
                 b = variableStack.pop();
                 a = variableStack.pop();
                 result = b + a ;
                 variableStack.push(result);
+                index++;
+
                 break;
             case "sub":
                 b = variableStack.pop();
                 a = variableStack.pop();
                 result = a - b ;
                 variableStack.push(result);
+                index++;
+
                 break;
             case "mul":
                 b = variableStack.pop();
                 a = variableStack.pop();
                 result = b * a ;
                 variableStack.push(result);
+                index++;
+
                 break;
             case "div":
-
-
                 b = variableStack.pop();
                 a = variableStack.pop();
 
@@ -200,18 +210,26 @@ public class JalRuntime {
                     result = a / b ;
                     variableStack.push(result);
                 }
+                index++;
+
                 break;
             case "print":
                 System.out.print(variableStack.peek());
+                index++;
+
                 break;
             case "println":
                 System.out.println(variableStack.peek());
+                index++;
+
                 break;
             case "":
+                index++;
+
                 break;
             case "store":
                 // System.out.println("variable stack:"+variableStack);
-
+//            	System.out.println("before store" + variableStack);
                 Stack<Integer> symbolTableStack = null;
                 if( SymbolTable.get(command.get(1)) == null ){
                     symbolTableStack = new Stack<Integer>();
@@ -222,26 +240,13 @@ public class JalRuntime {
                     symbolTableStack = SymbolTable.get(command.get(1));
                     symbolTableStack.push(variableStack.pop());
                 }
-
+//                System.out.println("after store" + variableStack);
                 SymbolTable.put(command.get(1), symbolTableStack);
-                // System.out.println("SymbolTable :"+SymbolTable);
-                // System.out.println("did u reach here");
+                index++;
 
-                    /*
-                    if (SymbolTable.get(command.get(1)) == null) {
-                        Stack<Integer> variableStack = new Stack<>();
-                        variableStack.push(variableStack.pop());
-                        SymbolTable.put(command.get(1), variableStack);
-                    } else {
-                        SymbolTable.get(command.get(1)).push(variableStack.pop());
-                    }
-                    */
                 break;
             case "load":
-                //System.out.println("commsnd:"+command);
-                //System.out.println("load:SymbolTable.get(command.get(1)).peek():"+SymbolTable.get(command.get(1)).peek());
-                //System.out.println("load: variableStack"+variableStack);
-                variableStack.push(SymbolTable.get(command.get(1)).peek());
+//                variableStack.push(SymbolTable.get(command.get(1)).peek());
                 
                 if (SymbolTable.get(command.get(1)) != null) {
                     variableStack.push(SymbolTable.get(command.get(1)).peek());
@@ -252,54 +257,71 @@ public class JalRuntime {
                 		// error
                 	}
                 }
+                index++;
 
                 break;
             case ".start":
                 //functionNames.put(command[2],new Pair())
+                index++;
+
                 break;
             case ".end":
+                index++;
+
                 //Function ends move back to global table
                 //Function move back to local stack
                 break;
             case "return":
+                index++;
+
                 //Return top of the local stack
                 break;
             case ".invoke":
             	String functionName = command.get(1);
-//            	System.out.println(functionName);
-                //System.out.println("functionStartLine:"+functionName);
-                // int scanIndex = functionStartLine.get(functionName) + 1;
-                excuteFunction(functionStartLine.get(functionName) + 1);
+            	int functionReturnLine = index;
+            	index = functionStartLine.get(functionName) + 1;
+                excuteFunction();
+                index = functionReturnLine + 1;
                 break;
 
             default:
                 //System.out.println();
                 throw new IllegalArgumentException("Command not recognized" + command.get(0));
         }
+//        System.out.println("Index: " + currentIndex + " after executeCommand: " + command);
+//        System.out.println(variableStack);
+        
+        
     }
 
-    private void evaluate_while(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
+    private void evaluate_while(HashMap<String, Stack<Integer>> SymbolTable) {
 
-        int while_start_index = methodScanIndex;
+        int while_start_index = index;
         int while_end_index = 0;
-        methodScanIndex++;
-        while(!allStatements.get(methodScanIndex).contains("branch_loop:0"))
+        index++;
+        while(!allStatements.get(index).contains("branch_loop:0"))
         {
             //System.out.println("In while 1st while, stats"+allStatements.get(methodScanIndex));
-            excuteCommand(allStatements.get(methodScanIndex++), SymbolTable);
+        	// count local variable 
+        	
+            excuteCommand(allStatements.get(index), SymbolTable);
         }
 
 
         if(if_flag){
             //System.out.println("In while if");
-            methodScanIndex++;
-            while(!allStatements.get(methodScanIndex).contains("end_while")){
+//        	index++;
+            while(!allStatements.get(index).contains("end_while")){
                 //System.out.println("In while if2"+allStatements.get(methodScanIndex));
-                excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
-                methodScanIndex++;
+            	// count local variable 
+            	
+                excuteCommand(allStatements.get(index), SymbolTable);
+                
             }
-            methodScanIndex = while_start_index;
-            excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
+            index = while_start_index;
+            // count local variable 
+            
+            excuteCommand(allStatements.get(index), SymbolTable);
             //while_end_index = methodScanIndex + 1;
         }
 
@@ -307,54 +329,66 @@ public class JalRuntime {
             //System.out.println("in while else");
 
 
-            while(!allStatements.get(methodScanIndex).contains("end_while")){
+            while(!allStatements.get(index).contains("end_while")){
                 //System.out.println("stats:"+allStatements.get(methodScanIndex));
-                methodScanIndex++;
+            	index++;
                 //excuteCommand(allStatements.get(methodScanIndex));
             }
-            methodScanIndex++;
+            index++;
         }
-
-
+        
     }
 
-    private void evaluate_if(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
-
+    
+    private void evaluate_if(HashMap<String, Stack<Integer>> SymbolTable) {
 
         //System.out.println("functionStartLine:"+command);
         // String functionName = command.get(1).trim();
 
         //System.out.println("evaluate_if if_flag"+allStatements.get(methodScanIndex));
+    	index++;
         if(if_flag){
-            methodScanIndex++;
-            while(!allStatements.get(methodScanIndex).contains("goto") && !allStatements.get(methodScanIndex).contains("endIf")){
-                excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
-                methodScanIndex++;
+            while(!allStatements.get(index).contains("goto") && 
+            		!allStatements.get(index).contains("endIf")){
+                
+            	excuteCommand(allStatements.get(index), SymbolTable);
+//            	index++;
             }
-            methodScanIndex++;
-            if(allStatements.get(methodScanIndex).contains("if_not_true:")){
-                while(!allStatements.get(methodScanIndex).contains("endIf:")){
-                    methodScanIndex++;
+            index++;
+            if(allStatements.get(index).contains("if_not_true:")){
+                while(!allStatements.get(index).contains("endIf:")){
+                	index++;
                 }
             }
-
+//            index++;
         }
         else{
 
             //System.out.println("else1"+allStatements.get(methodScanIndex));
-            methodScanIndex++;
-            while(!allStatements.get(methodScanIndex).contains("goto") && !allStatements.get(methodScanIndex).contains("endIf")){
+            while(!allStatements.get(index).contains("goto") && !allStatements.get(index).contains("endIf")){
                 //System.out.println("else2"+allStatements.get(methodScanIndex));
-                methodScanIndex++;
+            	index++;
             }
-            methodScanIndex++;
-            if(allStatements.get(methodScanIndex).contains("if_not_true:")){
-                methodScanIndex++;
-                while(!allStatements.get(methodScanIndex).contains("endIf:")){
+            index++;
+            if(allStatements.get(index).contains("if_not_true:")){
+            	index++;
+                while(!allStatements.get(index).contains("endIf:")){
                     //System.out.println("else3"+allStatements.get(methodScanIndex));
-                    excuteCommand(allStatements.get(methodScanIndex), SymbolTable);
-                    methodScanIndex++;
+                	// count local variable
+                	/*
+                	if (allStatements.get(index).get(0) == "store") {
+                        if (LocalVariableCount.get(allStatements.get(index).get(1)) == null) {
+                            LocalVariableCount.put(allStatements.get(index).get(1), 1);
+                        } else {
+                            int add1 = LocalVariableCount.get(allStatements.get(index).get(1)) + 1;
+                            LocalVariableCount.put(allStatements.get(index).get(1), add1);
+                        }
+                    }
+                    */
+                    excuteCommand(allStatements.get(index), SymbolTable);
+//                    index++;
                 }
+//                index++;
             }
 
 
@@ -362,66 +396,37 @@ public class JalRuntime {
 
         // //System.out.println("variable stack"+variableStack);
         //excuteCommand(allStatements.get(scanIndex));
-
+        
+        // remove local variable from ST
+        /*
+        for(Map.Entry<String, Integer> entry : LocalVariableCount.entrySet()){
+            String LocalVariable = entry.getKey();
+            int VariableCount = entry.getValue();
+            while (VariableCount > 0) {
+                SymbolTable.get(LocalVariable).pop();
+                if (SymbolTable.get(LocalVariable).size() == 0) {
+                	SymbolTable.remove(LocalVariable);
+                }
+            }
+        }
+        */
     }
 
-    private void excuteFunction(int index) {
+    
+    private void excuteFunction() {
 
-
-        //System.out.println("In excuteFunction:"+command);
-
-//        String functionName = command.get(2).trim();
-        int methodScanIndex = index;
-        //HashMap<String, Integer> LocalVariableCount = new HashMap<>();
         HashMap<String, Stack<Integer>> localSymbolTable = new HashMap<String, Stack<Integer>>();
         while (true) {
 
-            if(!allStatements.get(methodScanIndex).isEmpty() && 
-            		allStatements.get(methodScanIndex).get(0).trim().equals(".end")){
+            if(!allStatements.get(index).isEmpty() && 
+            		allStatements.get(index).get(0).trim().equals(".end")){
                 break;
             }
-
-                /*
-                if(allStatements.get(scanIndex).get(0).equals("store")){
-
-                   // ((localVariableMap.get(allStatements.get(scanIndex).get(1)) ==null ) ? localVariableMap.put(allStatements.get(scanIndex).get(1),1) :
-                     localVariableMap.put(allStatements.get(scanIndex).get(1))
-                }
-
-
-                if (allCommands[scanIndex][0] == "store") {
-                    if (LocalVariableCount.get(allCommands[scanIndex][1]) == null) {
-                        LocalVariableCount.put(allCommands[scanIndex][1], 1);
-                    } else {
-                        int add1 = LocalVariableCount.get(allCommands[scanIndex][1]);
-                        LocalVariableCount.put(allCommands[scanIndex][1], add1);
-                    }
-                }
-                */
-            excuteCommand(allStatements.get(methodScanIndex), localSymbolTable);
-            methodScanIndex++;
-
-
+            excuteCommand(allStatements.get(index), localSymbolTable);
         }
-        /*
-            for(Map.Entry<String, Integer> entry : LocalVariableCount.entrySet()){
-                String LocalVariable = entry.getKey();
-                int VariableCount = entry.getValue();
-                while (VariableCount > 0) {
-                    SymbolTable.get(LocalVariable).pop();
-                }
-            }
-            */
-
-
     }
-
-
+    
 }
-
-
-
-
 
 
 

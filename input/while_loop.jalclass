@@ -1,0 +1,26 @@
+.start method main paramCount: 0
+
+push 3
+store a loc:0
+
+push 10
+store b loc:1
+while:
+load a loc:0
+load b loc:1
+less_than
+
+branch_loop:0 if_true:0
+load a loc:0
+println
+load a loc:0
+push 1
+add
+store a loc:0
+end_while
+
+push 0
+return
+.end method main
+
+ 

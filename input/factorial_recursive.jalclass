@@ -1,0 +1,33 @@
+.start method fact paramCount: 1
+store n
+
+load n loc:0
+push 1
+greater_than
+
+branch_if:0 if_true:
+load n loc:0
+push 1
+sub
+.invoke fact paramsCount: 1
+load n loc:0
+mul
+store result loc:1
+branch_if:0 goto endIf
+branch_if:0 if_not_true: 
+push 1
+store result loc:1
+branch_if:0 endIf:
+
+load result loc:1
+return
+.end method fact
+.start method main paramCount: 0
+push 5
+.invoke fact paramsCount: 1
+println
+push 0
+return
+.end method main
+
+ 

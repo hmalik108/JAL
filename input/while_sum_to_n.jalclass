@@ -1,0 +1,36 @@
+.start method sum paramCount: 1
+store a
+
+push 1
+store c loc:1
+
+push 0
+store sum loc:2
+while:
+load c loc:1
+load a loc:0
+less_than
+
+branch_loop:0 if_true:0
+load sum loc:2
+load c loc:1
+add
+store sum loc:2
+load c loc:1
+push 1
+add
+store c loc:1
+end_while
+
+load sum loc:2
+return
+.end method sum
+.start method main paramCount: 0
+push 10
+.invoke sum paramsCount: 1
+println
+push 0
+return
+.end method main
+
+ 
