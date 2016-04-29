@@ -29,10 +29,10 @@ public class JalRuntime {
 
         //String s = "factorial_recursive.jalclass";//"test.jalclass";
         // String s = "if_else_find_maximum.jalclass";//"test.jalclass";
-        String s = "stack.jalclass";//"test.jalclass";
+        //String s = "stack.jalclass";//"test.jalclass";
         //System.out.println("hello");
         JalRuntime jrt = new JalRuntime();
-        jrt.evaluateBytecode(s);
+        jrt.evaluateBytecode(args[0]);
         //new JalRuntime().evaluateBytecode(s);
         //new JalRuntime().evaluateBytecode(args[0]);
         //System.out.println("JalStack stackL:\n" + jrt.jalStack);
@@ -192,7 +192,7 @@ return
 
             case "branch_if:":
                 //System.out.println("In branch_if:0");
-                ifStack.push(command.get(3));
+                ifStack.push(command.get(2));
                 evaluate_if(SymbolTable);
                 index++;
                 break;
