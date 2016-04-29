@@ -1,0 +1,20 @@
+.start method main paramCount: 0
+stack s
+
+push_stack s 10
+push_stack s 20
+push_stack s 30
+top_stack s
+println
+pop_stack s
+top_stack s
+println
+pop_stack s
+push_stack s 10
+push_stack s 20
+push_stack s 30
+push 0
+return
+.end method main
+
+ 

@@ -35,7 +35,7 @@ public class JalRuntime {
         jrt.evaluateBytecode(s);
         //new JalRuntime().evaluateBytecode(s);
         //new JalRuntime().evaluateBytecode(args[0]);
-        System.out.println("JalStack stackL:\n" + jrt.jalStack);
+        //System.out.println("JalStack stackL:\n" + jrt.jalStack);
 
 
     }
@@ -95,7 +95,7 @@ public class JalRuntime {
         int a, b, result;
 
         ;//System.out.println("Switch command:"+command);
-        System.out.println("command " + command);
+        //System.out.println("command " + command);
         ////System.out.println("command "+command);
         switch (command.get(0)) {
 
@@ -338,12 +338,12 @@ return
 
                 break;
             case "print":
-                //System.out.print(variableStack.peek());
+                System.out.print(variableStack.peek());
                 index++;
 
                 break;
             case "println":
-                //System.out.println(variableStack.peek());
+                System.out.println(variableStack.peek());
                 index++;
 
                 break;
