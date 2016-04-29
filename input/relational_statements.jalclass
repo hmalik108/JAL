@@ -6,7 +6,7 @@ load a loc:0
 load b loc:1
 less_than
 
-branch_if: if_true:  0
+branch_if: if_true: 0
 load b loc:1
 store result loc:2
 branch_if: goto endIf: 0
