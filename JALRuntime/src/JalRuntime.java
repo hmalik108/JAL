@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.ExecutionException;
 
 
 public class JalRuntime {
@@ -10,6 +11,10 @@ public class JalRuntime {
     Stack<Integer> variableStack = new Stack<Integer>();
     HashMap<String, Stack<Integer>> GlobalSymbolTable = new HashMap<>();
     HashMap<String, Integer> functionStartLine = new HashMap<String, Integer>();
+   // HashMap<String, Stack<Integer>> globalStackDataTypeTable = new HashMap<String,Stack<Integer>>();
+    HashMap<String, JalStack<Integer>> globalStackDataTypeTable = new HashMap<String,JalStack<Integer>>();
+    private Stack<Integer> stack;
+    private JalStack jalStack;
 
     private static int index = 0;
     private static boolean less_than_flag = false;
@@ -20,27 +25,34 @@ public class JalRuntime {
      *
      * @param args
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
-        String s = "E:/JAL/input/nested_if.jalclass";//"test.jalclass";
+        //String s = "factorial_recursive.jalclass";//"test.jalclass";
+       // String s = "if_else_find_maximum.jalclass";//"test.jalclass";
+        String s = "stack.jalclass";//"test.jalclass";
+        //System.out.println("hello");
+        JalRuntime jrt = new JalRuntime() ;
+        jrt.evaluateBytecode(s);
+        //new JalRuntime().evaluateBytecode(s);
         //new JalRuntime().evaluateBytecode(args[0]);
-        new JalRuntime().evaluateBytecode(s);
+        System.out.println("JalStack stackL:\n"+jrt.jalStack);
+
 
 
 
     }
 
-    private void evaluateBytecode(String filename) throws IOException {
+    private void evaluateBytecode(String filename) throws Exception {
 
-        ////System.out.println("In evaluateBytecode");
+        //////System.out.println("In evaluateBytecode");
         parseFile(filename);
 
 
     }
 
-    private void parseFile(String filename) throws IOException {
+    private void parseFile(String filename) throws Exception {
 
-        ////System.out.println("In parseFile");
+        //////System.out.println("In parseFile");
         FileInputStream fis = new FileInputStream(filename);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
         String line = null;
@@ -76,21 +88,118 @@ public class JalRuntime {
         br.close();
     }
 
-    public void excuteCommand(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) {
+    public void executeCommand(List<String> command, HashMap<String, Stack<Integer>> SymbolTable) throws Exception {
     	
 //    	int currentIndex = index; // just for test
 //    	System.out.println("Index: " + currentIndex + " In executeCommand: " + command);
 //    	System.out.println(variableStack);
 //    	System.out.println("Index: " + index);
         int a,b,result;
+
         ;//System.out.println("Switch command:"+command);
+        System.out.println("command "+command);
+        ////System.out.println("command "+command);
         switch(command.get(0)){
 
+
+            /*
+            .start method main paramCount: 0
+stack s
+
+push_stack s 10
+push_stack s 20
+push_stack s 30
+top_stack s
+println
+pop_stack s
+top_stack s
+println
+pop_stack s
+push 0
+return
+.end method main
+
+             */
+
+
+            case "stack":
+
+                //String s = command.get(1);
+                //stack = new Stack<Integer>();
+                jalStack = new JalStack<Integer>();
+                //globalStackDataTypeTable.put(command.get(1).trim(),stack);
+                globalStackDataTypeTable.put(command.get(1).trim(),jalStack);
+                index++;
+                break;
+
+            case "push_stack":
+
+              //  //System.out.println("in push ");
+               // //System.out.println("globalStackDataTypeTable "+globalStackDataTypeTable);
+               // //System.out.println("string "+command.get(1));
+               // //System.out.println("globalStackDataTypeTable  get"+globalStackDataTypeTable.get("s"));
+                String stackName = command.get(1).trim();
+                if(globalStackDataTypeTable.get(stackName)==null)
+                    throw new Exception("Stack not initialized "+stackName);
+                else{
+
+
+                    //stack = globalStackDataTypeTable.get(stackName);
+                    //stack.push(Integer.parseInt(command.get(2)));
+                    jalStack = globalStackDataTypeTable.get(stackName);
+                    jalStack.push(Integer.parseInt(command.get(2)));
+                    //globalStackDataTypeTable.put(stackName, stack);
+                    globalStackDataTypeTable.put(stackName, jalStack);
+                    //System.out.println("globalStackDataTypeTable "+globalStackDataTypeTable);
+                }
+
+                index++;
+                break;
+
+            case "top_stack":
+
+                //System.out.println("In top");
+                //System.out.println("globalStackDataTypeTable "+globalStackDataTypeTable);
+                if(globalStackDataTypeTable.get(command.get(1))==null)
+                    throw new Exception("Stack not found "+command.get(1));
+                else{
+
+                  // stack = globalStackDataTypeTable.get(command.get(1));
+                    jalStack = globalStackDataTypeTable.get(command.get(1));
+                   //variableStack.push(stack.peek());
+                   // Integer i = (Integer) jalStack.peek();
+                    variableStack.push((Integer)jalStack.peek());
+
+
+                }
+                index++;
+                break;
+
+            case "pop_stack":
+
+
+                if(globalStackDataTypeTable.get(command.get(1))==null)
+                    throw new Exception("Stack not found "+command.get(1));
+                else{
+                    //stack = globalStackDataTypeTable.get(command.get(1));
+                    jalStack = globalStackDataTypeTable.get(command.get(1));
+                    //stack.pop();
+                    jalStack.pop();
+                    globalStackDataTypeTable.put(command.get(1),jalStack);
+
+
+                }
+                index++;
+                break;
+
+
+
             case "branch_if:0":
-                //System.out.println("In branch_if:0");
+                ////System.out.println("In branch_if:0");
                 evaluate_if(SymbolTable);
                 index++;
                 break;
+
 
             case "branch_loop:0":
             	index++;
@@ -106,7 +215,7 @@ public class JalRuntime {
 
             case "greater_than":
 
-                //System.out.println(variableStack);
+                ////System.out.println(variableStack);
                 b = variableStack.pop();
                 a = variableStack.pop();
 
@@ -121,7 +230,7 @@ public class JalRuntime {
 
             case "greater_than_or_equal":
 
-                //System.out.println(variableStack);
+                ////System.out.println(variableStack);
                 b = variableStack.pop();
                 a = variableStack.pop();
 
@@ -136,7 +245,7 @@ public class JalRuntime {
                 break;
 
             case "less_than":
-                //System.out.println("In less_than");
+                ////System.out.println("In less_than");
                 b = variableStack.pop();
                 a = variableStack.pop();
                 if( a < b){
@@ -152,7 +261,7 @@ public class JalRuntime {
                 break;
 
             case "less_than_or_equal":
-                //System.out.println("In less_than");
+                ////System.out.println("In less_than");
                 b = variableStack.pop();
                 a = variableStack.pop();
                 if( a <= b){
@@ -171,7 +280,7 @@ public class JalRuntime {
             case "push":
                 //variable.push(Integer.parseInt(command.get(1)));
                 variableStack.push(Integer.parseInt(command.get(1)));
-//                System.out.println(variableStack);
+//                //System.out.println(variableStack);
                 index++;
 
                 break;
@@ -214,12 +323,12 @@ public class JalRuntime {
 
                 break;
             case "print":
-                System.out.print(variableStack.peek());
+                //System.out.print(variableStack.peek());
                 index++;
 
                 break;
             case "println":
-                System.out.println(variableStack.peek());
+                //System.out.println(variableStack.peek());
                 index++;
 
                 break;
@@ -228,8 +337,8 @@ public class JalRuntime {
 
                 break;
             case "store":
-                // System.out.println("variable stack:"+variableStack);
-//            	System.out.println("before store" + variableStack);
+                // //System.out.println("variable stack:"+variableStack);
+//            	//System.out.println("before store" + variableStack);
                 Stack<Integer> symbolTableStack = null;
                 if( SymbolTable.get(command.get(1)) == null ){
                     symbolTableStack = new Stack<Integer>();
@@ -240,7 +349,7 @@ public class JalRuntime {
                     symbolTableStack = SymbolTable.get(command.get(1));
                     symbolTableStack.push(variableStack.pop());
                 }
-//                System.out.println("after store" + variableStack);
+//                //System.out.println("after store" + variableStack);
                 SymbolTable.put(command.get(1), symbolTableStack);
                 index++;
 
@@ -285,54 +394,54 @@ public class JalRuntime {
                 break;
 
             default:
-                //System.out.println();
+                ////System.out.println();
                 throw new IllegalArgumentException("Command not recognized" + command.get(0));
         }
-//        System.out.println("Index: " + currentIndex + " after executeCommand: " + command);
-//        System.out.println(variableStack);
+//        //System.out.println("Index: " + currentIndex + " after executeCommand: " + command);
+//        //System.out.println(variableStack);
         
         
     }
 
-    private void evaluate_while(HashMap<String, Stack<Integer>> SymbolTable) {
+    private void evaluate_while(HashMap<String, Stack<Integer>> SymbolTable) throws Exception {
 
         int while_start_index = index;
         int while_end_index = 0;
         index++;
         while(!allStatements.get(index).contains("branch_loop:0"))
         {
-            //System.out.println("In while 1st while, stats"+allStatements.get(methodScanIndex));
+            ////System.out.println("In while 1st while, stats"+allStatements.get(methodScanIndex));
         	// count local variable 
         	
-            excuteCommand(allStatements.get(index), SymbolTable);
+            executeCommand(allStatements.get(index), SymbolTable);
         }
 
 
         if(if_flag){
-            //System.out.println("In while if");
+            ////System.out.println("In while if");
 //        	index++;
             while(!allStatements.get(index).contains("end_while")){
-                //System.out.println("In while if2"+allStatements.get(methodScanIndex));
+                ////System.out.println("In while if2"+allStatements.get(methodScanIndex));
             	// count local variable 
             	
-                excuteCommand(allStatements.get(index), SymbolTable);
+                executeCommand(allStatements.get(index), SymbolTable);
                 
             }
             index = while_start_index;
             // count local variable 
             
-            excuteCommand(allStatements.get(index), SymbolTable);
+            executeCommand(allStatements.get(index), SymbolTable);
             //while_end_index = methodScanIndex + 1;
         }
 
         else{
-            //System.out.println("in while else");
+            ////System.out.println("in while else");
 
 
             while(!allStatements.get(index).contains("end_while")){
                 //System.out.println("stats:"+allStatements.get(methodScanIndex));
             	index++;
-                //excuteCommand(allStatements.get(methodScanIndex));
+                //executeCommand(allStatements.get(methodScanIndex));
             }
             index++;
         }
@@ -340,23 +449,29 @@ public class JalRuntime {
     }
 
     
-    private void evaluate_if(HashMap<String, Stack<Integer>> SymbolTable) {
+    private void evaluate_if(HashMap<String, Stack<Integer>> SymbolTable) throws Exception {
 
         //System.out.println("functionStartLine:"+command);
         // String functionName = command.get(1).trim();
 
         //System.out.println("evaluate_if if_flag"+allStatements.get(methodScanIndex));
-    	index++;
+        HashMap<String, Stack<Integer>> localSymbolTable = new HashMap<String, Stack<Integer>>();
+        index++;
         if(if_flag){
-            while(!allStatements.get(index).contains("goto") && 
-            		!allStatements.get(index).contains("endIf")){
+            //while(!allStatements.get(index).contains("goto") &&
+                //!allStatements.get(index).contains("endIf")){
+
+            while(!allStatements.get(index).contains(Tokens.GO_TO) &&
+            		!allStatements.get(index).contains(Tokens.END_IF)){
                 
-            	excuteCommand(allStatements.get(index), SymbolTable);
+            	executeCommand(allStatements.get(index), SymbolTable);
 //            	index++;
             }
             index++;
-            if(allStatements.get(index).contains("if_not_true:")){
-                while(!allStatements.get(index).contains("endIf:")){
+            //if(allStatements.get(index).contains("if_not_true:")){
+                //while(!allStatements.get(index).contains("endIf:")){
+            if(allStatements.get(index).contains(Tokens.IF_NOT_TRUE)){
+                while(!allStatements.get(index).contains(Tokens.END_IF)){
                 	index++;
                 }
             }
@@ -365,6 +480,7 @@ public class JalRuntime {
         else{
 
             //System.out.println("else1"+allStatements.get(methodScanIndex));
+            //while(!allStatements.get(index).contains("goto") && !allStatements.get(index).contains("endIf")){
             while(!allStatements.get(index).contains("goto") && !allStatements.get(index).contains("endIf")){
                 //System.out.println("else2"+allStatements.get(methodScanIndex));
             	index++;
@@ -385,7 +501,7 @@ public class JalRuntime {
                         }
                     }
                     */
-                    excuteCommand(allStatements.get(index), SymbolTable);
+                    executeCommand(allStatements.get(index), SymbolTable);
 //                    index++;
                 }
 //                index++;
@@ -395,7 +511,7 @@ public class JalRuntime {
         }
 
         // //System.out.println("variable stack"+variableStack);
-        //excuteCommand(allStatements.get(scanIndex));
+        //executeCommand(allStatements.get(scanIndex));
         
         // remove local variable from ST
         /*
@@ -413,7 +529,7 @@ public class JalRuntime {
     }
 
     
-    private void excuteFunction() {
+    private void excuteFunction() throws Exception {
 
         HashMap<String, Stack<Integer>> localSymbolTable = new HashMap<String, Stack<Integer>>();
         while (true) {
@@ -422,7 +538,7 @@ public class JalRuntime {
             		allStatements.get(index).get(0).trim().equals(".end")){
                 break;
             }
-            excuteCommand(allStatements.get(index), localSymbolTable);
+            executeCommand(allStatements.get(index), localSymbolTable);
         }
     }
     
@@ -430,19 +546,28 @@ public class JalRuntime {
 
 
 
-enum Tokens2     {
+enum Tokens     {
 
-    IF_START("branch_if:0 if_true:") ,
+    GO_TO("goto"),
+    END_IF("endIf"),
+    IF_NOT_TRUE("if_not_true:");
+
+
+   /* IF_START("branch_if:0 if_true:") ,
     IF_END("branch_if:0 goto endIf"),
-    ENDIF("branch_if:0 endIf:") ,
+   // ENDIF("branch_if:0 endIf:") ,
     IF_NOT_TRUE("branch_if:0 if_not_true:") ,
     WHILE_END("end_while");
+
+    */
+
+
 
 
 
     public final String pattern;
 
-    private Tokens2(String pattern){
+    private Tokens(String pattern){
         this.pattern = pattern;
     }
 
