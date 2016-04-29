@@ -6,12 +6,12 @@ store c loc:1
 
 push 0
 store sum loc:2
-while:
+while: 0
 load c loc:1
 load a loc:0
 less_than
 
-branch_loop:0 if_true:0
+branch_loop: if_true: 0
 load sum loc:2
 load c loc:1
 add
@@ -20,7 +20,7 @@ load c loc:1
 push 1
 add
 store c loc:1
-end_while
+end_while: 0
 
 load sum loc:2
 return

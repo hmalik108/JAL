@@ -6,14 +6,14 @@ load a loc:0
 load b loc:1
 less_than
 
-branch_if:0 if_true:
+branch_if: if_true:  0
 load b loc:1
 store result loc:2
-branch_if:0 goto endIf
-branch_if:0 if_not_true: 
+branch_if: goto endIf: 0
+branch_if: if_not_true: 0
 load a loc:0
 store result loc:2
-branch_if:0 endIf:
+branch_if: endIf: 0
 
 load result loc:2
 return
