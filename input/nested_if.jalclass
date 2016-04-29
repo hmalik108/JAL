@@ -9,12 +9,12 @@ load a loc:0
 load b loc:1
 less_than
 
-branch_if: if_true:  1
+branch_if: if_true: 1
 load b loc:1
 push 4
 less_than
 
-branch_if: if_true:  0
+branch_if: if_true: 0
 load a loc:0
 load b loc:1
 add

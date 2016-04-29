@@ -4,7 +4,7 @@ push true
 store b loc:0
 
 load b loc:0
-branch_if: if_true:  0
+branch_if: if_true: 0
 push 10
 store c loc:1
 branch_if: goto endIf: 0
