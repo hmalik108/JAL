@@ -1,0 +1,16 @@
+func int booleanTest():
+	int b;
+	b = true;
+	int c;
+	if(b):
+		c = 10;
+	else:
+		c = 20;
+	end_if
+	return c;
+end_func
+
+func int main():
+	println(booleanTest());
+	return 0;
+end_func

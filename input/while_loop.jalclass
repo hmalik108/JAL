@@ -5,19 +5,31 @@ store a loc:0
 
 push 10
 store b loc:1
-while:
+while: 1
 load a loc:0
 load b loc:1
 less_than
 
-branch_loop:0 if_true:0
+branch_loop: if_true: 1
 load a loc:0
 println
+while: 0
+load a loc:0
+push 5
+less_than
+
+branch_loop: if_true: 0
 load a loc:0
 push 1
 add
 store a loc:0
-end_while
+end_while: 0
+
+load a loc:0
+push 1
+add
+store a loc:0
+end_while: 1
 
 push 0
 return

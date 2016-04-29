@@ -5,7 +5,7 @@ load n loc:0
 push 1
 greater_than
 
-branch_if:0 if_true:
+branch_if: if_true:  0
 load n loc:0
 push 1
 sub
@@ -13,11 +13,11 @@ sub
 load n loc:0
 mul
 store result loc:1
-branch_if:0 goto endIf
-branch_if:0 if_not_true: 
+branch_if: goto endIf: 0
+branch_if: if_not_true: 0
 push 1
 store result loc:1
-branch_if:0 endIf:
+branch_if: endIf: 0
 
 load result loc:1
 return

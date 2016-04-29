@@ -1,0 +1,9 @@
+.start method main paramCount: 0
+
+push true
+store b loc:0
+push 0
+return
+.end method main
+
+ 

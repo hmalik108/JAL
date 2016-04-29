@@ -9,31 +9,31 @@ load a loc:0
 load b loc:1
 less_than
 
-branch_if:1 if_true:
+branch_if: if_true:  1
 load b loc:1
 push 4
 less_than
 
-branch_if:0 if_true:
+branch_if: if_true:  0
 load a loc:0
 load b loc:1
 add
 println
-branch_if:0 goto endIf
-branch_if:0 if_not_true: 
+branch_if: goto endIf: 0
+branch_if: if_not_true: 0
 load a loc:0
 println
-branch_if:0 endIf:
+branch_if: endIf: 0
 
-branch_if:1 goto endIf
-branch_if:1 if_not_true: 
+branch_if: goto endIf: 1
+branch_if: if_not_true: 1
 load a loc:0
 load a loc:0
 mul
 load b loc:1
 add
 println
-branch_if:1 endIf:
+branch_if: endIf: 1
 
 load a loc:0
 return

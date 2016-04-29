@@ -1,4 +1,4 @@
-.start method greater paramCount: 2
+.start method max paramCount: 2
 store b
 store a
 
@@ -8,20 +8,20 @@ less_than
 
 branch_if: if_true:  0
 load b loc:1
-store result loc:2
+store c loc:2
 branch_if: goto endIf: 0
 branch_if: if_not_true: 0
 load a loc:0
-store result loc:2
+store c loc:2
 branch_if: endIf: 0
 
-load result loc:2
+load c loc:2
 return
-.end method greater
+.end method max
 .start method main paramCount: 0
-push 10
-push 11
-.invoke greater paramsCount: 2
+push 5
+push 8
+.invoke max paramsCount: 2
 println
 push 0
 return

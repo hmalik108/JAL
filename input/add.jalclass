@@ -1,0 +1,21 @@
+.start method add paramCount: 2
+store b
+store a
+
+load a loc:0
+load b loc:1
+add
+store c loc:2
+load c loc:2
+return
+.end method add
+.start method main paramCount: 0
+push 5
+push 8
+.invoke add paramsCount: 2
+println
+push 0
+return
+.end method main
+
+ 
